@@ -196,12 +196,12 @@
                         </div>
                     </div>
                     <div class="flex flex-wrap gap-2">
-                        <a href="https://www.openstreetmap.org/?mlat=45.9646&mlon=63.3052#map=11/45.9646/63.3052"
+                        <a href="https://www.openstreetmap.org/?mlat=45.6167&mlon=63.3167#map=12/45.6167/63.3167"
                            target="_blank" rel="noopener"
                            class="bg-white hover:bg-[#F5F5F2] border border-[#C6C6C0] text-[#3E4C59] px-4 py-2 rounded-xl text-sm font-semibold flex items-center gap-2 transition-colors">
                             <i class="fa-solid fa-up-right-from-square"></i> Үлкейтіп ашу
                         </a>
-                        <a href="https://www.google.com/maps?q=45.9646,63.3052"
+                        <a href="https://www.google.com/maps?q=45.6167,63.3167"
                            target="_blank" rel="noopener"
                            class="bg-[#3E4C59] hover:bg-[#2F3A45] text-white px-4 py-2 rounded-xl text-sm font-semibold flex items-center gap-2 transition-colors">
                             <i class="fa-solid fa-location-dot"></i> Google Maps-те ашу
@@ -224,13 +224,13 @@
                                 <li><strong class="text-[#2A2A26]">Ел:</strong> Қазақстан</li>
                                 <li><strong class="text-[#2A2A26]">Облыс:</strong> Қызылорда облысы</li>
                                 <li><strong class="text-[#2A2A26]">Қала:</strong> Байқоңыр</li>
-                                <li><strong class="text-[#2A2A26]">Координаттар:</strong> 45.9646° N, 63.3052° E</li>
+                                <li><strong class="text-[#2A2A26]">Координаттар:</strong> 45.6167° N, 63.3167° E</li>
                             </ul>
                         </div>
                         <div class="bg-[#E5E8EB] border border-[#C6C6C0] rounded-xl p-4">
                             <p class="text-sm text-[#3E4C59] leading-relaxed">
                                 <i class="fa-solid fa-rocket mr-1"></i>
-                                Байқоңыр — әлемдегі ең алғашқы және ең үлкен ғарыш айлағы. Осы жерден Қуандық Құдайбергенұлының «Сәт сапар!» өлеңінің кейіпкері Айдын Аимбетов 2015 жылы ғарышқа аттанды.
+                                Байқоңыр — әлемдегі ең алғашқы және ең үлкен ғарыш айлағы орналасқан қала. Осы жерден Қуандық Құдайбергенұлының «Сәт сапар!» өлеңінің кейіпкері Айдын Аимбетов 2015 жылы ғарышқа аттанды.
                             </p>
                         </div>
                     </div>
@@ -386,7 +386,6 @@
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                     <div class="group relative rounded-xl overflow-hidden border border-[#D9D9D3] bg-white">
-                        <!-- Изменено на h-auto, чтобы фото было полностью видно -->
                         <img src="images/kagaz.jpeg" alt="Портрет" class="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-300" onerror="this.onerror=null; this.src='https://placehold.co/400x300/f1f5f9/3e4c59?text=1';">
                         <div class="p-4 bg-[#F5F5F2] border-t border-[#D9D9D3]">
                             <h4 class="font-bold text-[#2A2A26] text-sm">Официалды портреті</h4>
@@ -395,7 +394,6 @@
                     </div>
 
                     <div class="group relative rounded-xl overflow-hidden border border-[#D9D9D3] bg-white">
-                        <!-- Изменено на h-auto, чтобы фото было полностью видно -->
                         <img src="images/baldar.jpeg" alt="Жұмыс сәті" class="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-300" onerror="this.onerror=null; this.src='https://placehold.co/400x300/f1f5f9/3e4c59?text=2';">
                         <div class="p-4 bg-[#F5F5F2] border-t border-[#D9D9D3]">
                             <h4 class="font-bold text-[#2A2A26] text-sm">Шығармашылық сәт</h4>
@@ -404,7 +402,6 @@
                     </div>
 
                     <div class="group relative rounded-xl overflow-hidden border border-[#D9D9D3] bg-white">
-                        <!-- Изменено на h-auto, чтобы фото было полностью видно -->
                         <img src="images/olen.jpeg" alt="Сәт Сапар және Айдын" class="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-300" onerror="this.onerror=null; this.src='https://placehold.co/400x300/f1f5f9/3e4c59?text=3';">
                         <div class="p-4 bg-[#F5F5F2] border-t border-[#D9D9D3]">
                             <h4 class="font-bold text-[#2A2A26] text-sm">«Сәт сапар!» парақшасы</h4>
@@ -481,11 +478,12 @@
             const mapEl = document.getElementById('map');
             if (!mapEl || typeof L === 'undefined') return;
 
-            const baikonurCoords = [45.9646, 63.3052];
+            // Координаты города Байконур (а не космодрома)
+            const baikonurCoords = [45.6167, 63.3167];
 
             const map = L.map('map', {
                 center: baikonurCoords,
-                zoom: 11,
+                zoom: 12,
                 scrollWheelZoom: true
             });
 
@@ -505,12 +503,12 @@
             const marker = L.marker(baikonurCoords, { icon: baikonurIcon }).addTo(map);
 
             marker.bindPopup(`
-                <h4>🚀 Байқоңыр</h4>
+                <h4>🚀 Байқоңыр қаласы</h4>
                 <div><strong>Ел:</strong> Қазақстан</div>
                 <div><strong>Облыс:</strong> Қызылорда облысы</div>
                 <div><strong>Қала:</strong> Байқоңыр</div>
                 <div style="margin-top:6px; font-size:12px; color:#56564F;">
-                    Әлемдегі ең алғашқы ғарыш айлағы.<br>
+                    Әлемдегі ең алғашқы ғарыш айлағы орналасқан қала.<br>
                     «Сәт сапар!» өлеңінің шабыт көзі.
                 </div>
             `).openPopup();
@@ -518,7 +516,7 @@
             L.circle(baikonurCoords, {
                 color: '#3E4C59', weight: 1, opacity: 0.5,
                 fillColor: '#3E4C59', fillOpacity: 0.06,
-                radius: 30000
+                radius: 15000
             }).addTo(map);
 
             const kyzylordaCoords = [44.8488, 65.4823];
