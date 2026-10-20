@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Қуандық Құдайбергенұлы - «Сәт сапар!» | Әдеби-Ғарыштық Портал</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;600;700;800&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <style>
+        :root {
+            --bg: #EDEDE9;
+            --bg-soft: #F5F5F2;
+            --bg-inner: #F7F7F4;
+            --card: #FFFFFF;
+            --border: #D9D9D3;
+            --border-strong: #C6C6C0;
+            --text: #2A2A26;
+            --text-soft: #56564F;
+            --text-muted: #87877E;
+            --accent: #3E4C59;
+            --accent-hover: #2F3A45;
+            --accent-tint: #E5E8EB;
+        }
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+        }
+        h1, h2, h3, h4, .space-font { font-family: 'Exo 2', sans-serif; }
+        .space-bg { background-color: var(--bg); }
+        .glow-card {
+            background: var(--card);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+            border: 1px solid var(--border);
+        }
+        .glow-card:hover {
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+            border-color: var(--border-strong);
+        }
+        .accent-text { color: var(--accent); }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg); }
+        ::-webkit-scrollbar-thumb { background: #B8B8B1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+        input[type="radio"] { accent-color: var(--accent); }
+
+        #map { height: 440px; width: 100%; border-radius: 12px; z-index: 0; }
+        .leaflet-container { font-family: 'Montserrat', sans-serif; background: #EDEDE9; }
+        .leaflet-popup-content-wrapper {
+            background: #FFFFFF; border: 1px solid var(--border-strong);
+            color: var(--text); border-radius: 10px;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.10);
+        }
+        .leaflet-popup-tip { background: #FFFFFF; border: 1px solid var(--border-strong); }
+        .leaflet-popup-content { margin: 12px 14px; font-size: 13px; line-height: 1.5; }
+        .leaflet-popup-content h4 { margin: 0 0 4px 0; font-size: 15px; color: var(--accent); font-weight: 700; }
+        .baikonur-pin {
+            background: var(--accent);
+            border: 3px solid #FFFFFF;
+            border-radius: 50%;
+            width: 20px; height: 20px;
+            box-shadow: 0 0 0 3px rgba(62, 76, 89, 0.25);
+        }
+    </style>
+</head>
+<body class="space-bg min-h-screen flex flex-col justify-between">
+
+    <!-- Navigation -->
+    <header class="no-print sticky top-0 z-50 bg-[#F5F5F2]/95 backdrop-blur-md border-b border-[#D9D9D3]">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-[#3E4C59] flex items-center justify-center text-white shadow-sm">
+                        <i class="fa-solid font-bold fa-rocket text-lg"></i>
+                    </div>
+                    <div>
+                        <span class="space-font font-bold text-lg sm:text-xl text-[#2A2A26] tracking-wide">Байқоңыр & Поэзия</span>
+                        <span class="block text-xs text-[#3E4C59]">Қуандық Құдайбергенұлы</span>
+                    </div>
+                </div>
+                <nav class="hidden md:flex space-x-5 text-sm font-medium">
+                    <a href="#about" class="text-[#56564F] hover:text-[#3E4C59] transition-colors">Ақын жайлы</a>
+                    <a href="#map-section" class="text-[#56564F] hover:text-[#3E4C59] transition-colors">Карта</a>
+                    <a href="#poem" class="text-[#56564F] hover:text-[#3E4C59] transition-colors">«Сәт сапар!»</a>
+                    <a href="#passport" class="text-[#56564F] hover:text-[#3E4C59] transition-colors">Әдеби паспорт</a>
+                    <a href="#quiz" class="text-[#56564F] hover:text-[#3E4C59] transition-colors">Викторина</a>
+                    <a href="#feedback" class="text-[#56564F] hover:text-[#3E4C59] transition-colors">Пікірлер</a>
+                </nav>
+                <a href="#poem" class="bg-[#3E4C59] hover:bg-[#2F3A45] text-white px-4 py-2 rounded-xl text-sm font-semibold shadow-sm transition-colors">
+                    Өлеңді тыңдау
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="relative py-12 lg:py-20 overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+                <div class="lg:col-span-7 space-y-6 text-center lg:text-left">
+                    <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#E5E8EB] border border-[#C6C6C0] text-[#3E4C59] text-xs sm:text-sm font-medium">
+                        <i class="fa-solid fa-star"></i> Байқоңыр ақыны • Ғарыштық Поэзия
+                    </div>
+                    <h1 class="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-[#3E4C59] leading-tight">
+                        Қуандық Құдайбергенұлы
+                    </h1>
+                    <p class="text-[#56564F] text-base sm:text-lg leading-relaxed max-w-2xl mx-auto lg:mx-0">
+                        Ғарыш пен жырдың тоғысқан мекені — Байқоңыр перзенті, заңгер әрі ақын. Оның шығармашылығы отансүйгіштікке, туған жерге деген сүйіспеншілік пен ғарыштық жігерге толы.
+                    </p>
+                    <div class="flex flex-wrap gap-4 justify-center lg:justify-start pt-2">
+                        <a href="#poem" class="bg-[#3E4C59] hover:bg-[#2F3A45] text-white font-bold px-6 py-3 rounded-xl shadow-sm transition-colors flex items-center gap-2">
+                            <i class="fa-solid fa-book-open"></i> «Сәт сапар!» өлеңін оқу
+                        </a>
+                        <a href="#map-section" class="bg-white hover:bg-[#F5F5F2] text-[#3E4C59] font-medium px-6 py-3 rounded-xl border border-[#C6C6C0] transition-colors flex items-center gap-2">
+                            <i class="fa-solid fa-map-location-dot"></i> Картадан көру
+                        </a>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-5 relative">
+                    <div class="relative mx-auto max-w-sm rounded-2xl overflow-hidden glow-card p-3 bg-white">
+                        <img src="images/kagaz.jpeg" alt="Қуандық Құдайбергенұлы" class="w-full h-auto rounded-xl object-cover" onerror="this.onerror=null; this.src='https://placehold.co/400x500/f1f5f9/3e4c59?text=%D9%8A%D1%83%D0%B0%D0%BD%D0%B4%D1%8B%D1%82+%D2%AE%D2%B1%D0%B4%D0%B0%D0%B9%D0%B1%D0%B5%D1%80%D0%B3%D0%B5%D0%BD%D2%B1%D0%BB%D1%8B';">
+                        <div class="p-4 text-center">
+                            <h3 class="text-xl font-bold text-[#2A2A26]">Қуандық Құдайбергенұлы</h3>
+                            <p class="text-xs text-[#3E4C59] mt-1">Ақын, Заңгер, Байқоңыр жыршысы</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content Grid -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16 py-8">
+
+        <!-- Biography Section -->
+        <section id="about" class="scroll-mt-20">
+            <div class="glow-card rounded-2xl p-6 sm:p-10">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="w-10 h-10 rounded-xl bg-[#E5E8EB] border border-[#C6C6C0] flex items-center justify-center text-[#3E4C59]">
+                        <i class="fa-solid fa-id-card text-xl"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl sm:text-3xl font-bold text-[#2A2A26]">Ақынның өмірбаяны мен шығармашылығы</h2>
+                        <p class="text-sm text-[#87877E]">Қуандық Құдайбергенұлы жайлы маңызды деректер</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                    <div class="space-y-4 text-[#56564F]">
+                        <p class="leading-relaxed">
+                            <strong class="text-[#2A2A26]">Қуандық Құдайбергенұлы</strong> 1953 жылы Қызылорда облысының Жалағаш ауданында дүниеге келген.
+                        </p>
+                        <ul class="space-y-3">
+                            <li class="flex items-start gap-3">
+                                <i class="fa-solid fa-user-graduate text-[#3E4C59] mt-1"></i>
+                                <span><strong class="text-[#2A2A26]">Мамандығы:</strong> Заңгер. Ішкі істер мектебін бітірген.</span>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <i class="fa-solid fa-briefcase text-[#3E4C59] mt-1"></i>
+                                <span><strong class="text-[#2A2A26]">Қызметі:</strong> Ұзақ жылдар бойы Қазақстан Республикасы Ұлттық ғарыш агенттігінің «Инфракос» республикалық мемлекеттік кәсіпорны кадрлар жұмысын басқарды.</span>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <i class="fa-solid fa-book-bookmark text-[#3E4C59] mt-1"></i>
+                                <span><strong class="text-[#2A2A26]">Еңбектері:</strong> «Байқоңыр жырлайды» (2010 ж.), «Жылдарым – бақыт құсым» (2011 ж.) жеке өлеңдер жинағы.</span>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <i class="fa-solid fa-award text-[#3E4C59] mt-1"></i>
+                                <span><strong class="text-[#2A2A26]">Марапаттары:</strong> «Қазақстан Конституциясына – 10 жыл», «Қазақстан Республикасы Тәуелсіздігіне – 20 жыл», Инвестициялар және даму министрлігінің мерекелік медальдарымен, Президенттің Алғыс хатымен марапатталған.</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="rounded-xl overflow-hidden border border-[#D9D9D3] shadow-sm">
+                        <img src="images/sign.jpeg" alt="Қуандық Құдайбергенұлы кітап қолтаңбасы" class="w-full h-auto object-cover" onerror="this.onerror=null; this.src='https://placehold.co/600x400/f1f5f9/3e4c59?text=%D2%AE%D1%83%D0%B0%D0%BD%D0%B4%D1%8B%D1%82+%D2%AE%D2%B1%D0%B4%D0%B0%D0%B9%D0%B1%D0%B5%D1%80%D0%B3%D0%B5%D0%BD%D2%B1%D0%BB%D1%8B+Work';">
+                        <div class="p-3 bg-[#F5F5F2] text-center text-xs text-[#87877E] border-t border-[#D9D9D3]">
+                            Қуандық Құдайбергенұлы өзінің «Жылдарым – бақыт құсым» жинағына қолтаңба беру үстінде
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- MAP SECTION -->
+        <section id="map-section" class="scroll-mt-20">
+            <div class="glow-card rounded-2xl p-6 sm:p-10">
+                <div class="flex items-center justify-between flex-wrap gap-4 mb-6">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-[#E5E8EB] border border-[#C6C6C0] flex items-center justify-center text-[#3E4C59]">
+                            <i class="fa-solid fa-map-location-dot text-xl"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-2xl sm:text-3xl font-bold text-[#2A2A26]">Картадағы Байқоңыр</h2>
+                            <p class="text-sm text-[#87877E]">Қазақстан • Қызылорда облысы • Байқоңыр қаласы</p>
+                        </div>
+                    </div>
+                    <div class="flex flex-wrap gap-2">
+                        <a href="https://www.openstreetmap.org/?mlat=45.9646&mlon=63.3052#map=11/45.9646/63.3052"
+                           target="_blank" rel="noopener"
+                           class="bg-white hover:bg-[#F5F5F2] border border-[#C6C6C0] text-[#3E4C59] px-4 py-2 rounded-xl text-sm font-semibold flex items-center gap-2 transition-colors">
+                            <i class="fa-solid fa-up-right-from-square"></i> Үлкейтіп ашу
+                        </a>
+                        <a href="https://www.google.com/maps?q=45.9646,63.3052"
+                           target="_blank" rel="noopener"
+                           class="bg-[#3E4C59] hover:bg-[#2F3A45] text-white px-4 py-2 rounded-xl text-sm font-semibold flex items-center gap-2 transition-colors">
+                            <i class="fa-solid fa-location-dot"></i> Google Maps-те ашу
+                        </a>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                    <div class="lg:col-span-8">
+                        <div class="rounded-xl overflow-hidden border border-[#D9D9D3] shadow-sm bg-[#F5F5F2] p-2">
+                            <div id="map"></div>
+                        </div>
+                    </div>
+                    <div class="lg:col-span-4 space-y-3">
+                        <div class="bg-[#F7F7F4] border border-[#D9D9D3] rounded-xl p-4">
+                            <h4 class="font-bold text-[#2A2A26] text-base mb-2 flex items-center gap-2">
+                                <i class="fa-solid fa-location-crosshairs text-[#3E4C59]"></i> Нүкте туралы
+                            </h4>
+                            <ul class="space-y-2 text-sm text-[#56564F]">
+                                <li><strong class="text-[#2A2A26]">Ел:</strong> Қазақстан</li>
+                                <li><strong class="text-[#2A2A26]">Облыс:</strong> Қызылорда облысы</li>
+                                <li><strong class="text-[#2A2A26]">Қала:</strong> Байқоңыр</li>
+                                <li><strong class="text-[#2A2A26]">Координаттар:</strong> 45.9646° N, 63.3052° E</li>
+                            </ul>
+                        </div>
+                        <div class="bg-[#E5E8EB] border border-[#C6C6C0] rounded-xl p-4">
+                            <p class="text-sm text-[#3E4C59] leading-relaxed">
+                                <i class="fa-solid fa-rocket mr-1"></i>
+                                Байқоңыр — әлемдегі ең алғашқы және ең үлкен ғарыш айлағы. Осы жерден Қуандық Құдайбергенұлының «Сәт сапар!» өлеңінің кейіпкері Айдын Аимбетов 2015 жылы ғарышқа аттанды.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Poem & Speech Audio Section -->
+        <section id="poem" class="scroll-mt-20">
+            <div class="glow-card rounded-2xl p-6 sm:p-10 bg-white">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8 pb-6 border-b border-[#D9D9D3]">
+                    <div>
+                        <span class="text-xs uppercase font-bold text-[#3E4C59] tracking-wider">Арнау өлең</span>
+                        <h2 class="text-3xl sm:text-4xl font-extrabold text-[#2A2A26] mt-1">«Сәт сапар!»</h2>
+                        <p class="text-[#87877E] text-sm">Қазақ ғарышкері <strong class="text-[#56564F]">Айдын Аимбетовке</strong> арналған</p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <button id="speech-btn" onclick="toggleAudio()" class="bg-[#3E4C59] hover:bg-[#2F3A45] text-white font-bold px-5 py-2.5 rounded-xl flex items-center gap-2 shadow-sm transition-colors">
+                            <i id="speech-icon" class="fa-solid fa-play"></i> <span id="speech-text">Өлеңді дауыстап оқу</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                    <div class="lg:col-span-7 space-y-6">
+                        <div class="bg-[#F7F7F4] p-6 sm:p-8 rounded-2xl border border-[#D9D9D3] font-serif text-lg sm:text-xl text-[#2A2A26] leading-relaxed text-center sm:text-left space-y-6">
+                            <p>
+                                Байқоңыр - бұл ғарыштың баспалдағы<br>
+                                Ұласқан құс жолына аспандағы.<br>
+                                Адамзат тарихында осы жерден<br>
+                                Жұлдызға Ұлы жорық басталғанды.
+                            </p>
+                            <p>
+                                Бетке алып көк аспанды зымырандар,<br>
+                                Ғарышқа сапар шекті талай жылдар.<br>
+                                Тәуелсіздік байрағын жұлдыздарға<br>
+                                Жеткізді Талғатымдай Батыр ұлдар.
+                            </p>
+                            <p>
+                                Көк бөрінің ұрпағы, Қазақ – атым,<br>
+                                Ежелден ер халық деп саналатын.<br>
+                                Қасиетті Құранды айға апардық<br>
+                                Ардақтап аталардың аманатын.
+                            </p>
+                            <p class="text-[#3E4C59] font-semibold">
+                                Бүгін той, Байқоңырда Ұлан-асыр<br>
+                                Ғарышқа Қазақ ұшып бара жатыр!<br>
+                                Талғамтай ағалардың жолын берсін<br>
+                                Сапарың сәтті болсын, Айдын-батыр!
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="lg:col-span-5 space-y-4">
+                        <div class="rounded-2xl overflow-hidden border border-[#D9D9D3] p-2 bg-[#F5F5F2] shadow-sm">
+                            <img src="images/aidyn.jpeg" alt="Айдын Аимбетов және Сәт Сапар өлеңі" class="w-full h-auto rounded-xl object-cover" onerror="this.onerror=null; this.src='https://placehold.co/400x500/f1f5f9/3e4c59?text=%D0%90%D0%B9%D0%B4%D1%8B%D0%BD+%D0%90%D0%B8%D0%BC%D0%B1%D0%B5%D1%82%D0%BE%D0%B2';">
+                            <div class="p-3 text-center bg-white rounded-xl mt-2">
+                                <h4 class="text-[#2A2A26] font-bold">Айдын Аимбетов</h4>
+                                <p class="text-xs text-[#87877E]">Халық Қаһарманы, Қазақстан ғарышкері (05.09.2015 сапары)</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Interactive Literary Passport Section -->
+        <section id="passport" class="scroll-mt-20">
+            <div class="glow-card rounded-2xl p-6 sm:p-10">
+                <div class="mb-6">
+                    <span class="text-xs text-[#3E4C59] font-bold uppercase tracking-widest">Интерактивті оқу құралы</span>
+                    <h2 class="text-2xl sm:text-3xl font-bold text-[#2A2A26]">Интерактивті «Әдеби карта / Әдеби паспорт»</h2>
+                </div>
+
+                <div class="bg-[#F7F7F4] rounded-2xl p-6 border border-[#D9D9D3] text-[#56564F]">
+                    <div class="text-center border-b border-[#D9D9D3] pb-4 mb-6">
+                        <h3 class="text-xl font-bold text-[#3E4C59]">«Туған жердің әдеби картасы» — Байқоңыр Нүктесі</h3>
+                        <p class="text-xs text-[#87877E] mt-1">Зерттеу бағыты: МЕКЕН → АҚЫН → ШЫҒАРМА → СЕЗІМ → ҚҰНДЫЛЫҚ</p>
+                    </div>
+
+                    <div class="overflow-x-auto mb-6">
+                        <table class="w-full text-left text-sm border-collapse border border-[#D9D9D3] bg-white">
+                            <thead>
+                                <tr class="bg-[#E5E8EB] text-[#3E4C59] border-b border-[#D9D9D3]">
+                                    <th class="p-3 border border-[#D9D9D3]">Картадағы нүкте</th>
+                                    <th class="p-3 border border-[#D9D9D3]">Ақын</th>
+                                    <th class="p-3 border border-[#D9D9D3]">Туған жер бейнесі</th>
+                                    <th class="p-3 border border-[#D9D9D3]">Негізгі құндылық</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="hover:bg-[#F5F5F2]">
+                                    <td class="p-3 border border-[#D9D9D3] font-bold text-[#2A2A26]">Байқоңыр</td>
+                                    <td class="p-3 border border-[#D9D9D3] font-semibold text-[#3E4C59]">Қуандық Құдайбергенұлы</td>
+                                    <td class="p-3 border border-[#D9D9D3]">Ғарыш, айлақ, жұлдыздар</td>
+                                    <td class="p-3 border border-[#D9D9D3] font-semibold text-[#2A2A26]">Отансүйгіштік, Ұлттық мақтаныш</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="space-y-4">
+                        <h4 class="font-bold text-[#2A2A26] text-base">Жобаның формуласы мен нәтижесі:</h4>
+                        <div class="bg-white p-4 rounded-xl border border-[#D9D9D3] flex flex-wrap justify-between items-center text-xs sm:text-sm gap-2 text-[#3E4C59] font-mono">
+                            <span>Байқоңыр (Мекен)</span> &rarr;
+                            <span>Қуандық (Ақын)</span> &rarr;
+                            <span>«Сәт сапар!» (Өлең)</span> &rarr;
+                            <span>Мақтаныш (Сезім)</span> &rarr;
+                            <span>Отанды сүю (Құндылық)</span>
+                        </div>
+                    </div>
+
+                    <!-- Student info (auto-saved to browser) -->
+                    <div class="mt-8 pt-6 border-t border-[#D9D9D3] grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+                        <div>
+                            <label class="block text-[#87877E] mb-1">Зерттеуші оқушының аты-жөні:</label>
+                            <input type="text" id="student-name" placeholder="Аты-жөніңізді жазыңыз..." class="w-full bg-white border border-[#C6C6C0] rounded-lg p-2 text-[#2A2A26] placeholder-[#A8A8A0] focus:outline-none focus:border-[#3E4C59]">
+                        </div>
+                        <div>
+                            <label class="block text-[#87877E] mb-1">Мектеп / Сынып:</label>
+                            <input type="text" id="student-school" placeholder="Мектеп және 9-сынып..." class="w-full bg-white border border-[#C6C6C0] rounded-lg p-2 text-[#2A2A26] placeholder-[#A8A8A0] focus:outline-none focus:border-[#3E4C59]">
+                        </div>
+                        <p class="sm:col-span-2 text-[#87877E] italic">
+                            <i class="fa-solid fa-circle-info mr-1"></i> Деректер браузерде автоматты түрде сақталады.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Quiz Section -->
+        <section id="quiz" class="scroll-mt-20">
+            <div class="glow-card rounded-2xl p-6 sm:p-10">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="w-10 h-10 rounded-xl bg-[#E5E8EB] border border-[#C6C6C0] flex items-center justify-center text-[#3E4C59]">
+                        <i class="fa-solid fa-graduation-cap text-xl"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl sm:text-3xl font-bold text-[#2A2A26]">Интерактивті викторина</h2>
+                        <p class="text-sm text-[#87877E]">Қуандық Құдайбергенұлы мен «Сәт сапар!» өлеңі бойынша біліміңді тексер</p>
+                    </div>
+                </div>
+
+                <div id="quiz-container" class="space-y-6"></div>
+
+                <div id="quiz-result" class="hidden mt-6 p-6 rounded-xl bg-[#F7F7F4] border border-[#C6C6C0] text-center">
+                    <h3 class="text-2xl font-bold text-[#3E4C59] mb-2">Нәтижеңіз: <span id="score-text">0/4</span></h3>
+                    <p id="result-message" class="text-[#56564F] text-sm mb-4"></p>
+                    <button onclick="resetQuiz()" class="bg-[#3E4C59] hover:bg-[#2F3A45] text-white font-bold px-6 py-2 rounded-xl text-sm transition-colors">
+                        Қайта өту
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Photo Gallery Section -->
+        <section id="gallery" class="scroll-mt-20">
+            <div class="glow-card rounded-2xl p-6 sm:p-10">
+                <div class="flex items-center gap-3 mb-8">
+                    <div class="w-10 h-10 rounded-xl bg-[#E5E8EB] border border-[#C6C6C0] flex items-center justify-center text-[#3E4C59]">
+                        <i class="fa-solid fa-images text-xl"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl sm:text-3xl font-bold text-[#2A2A26]">Фотогалерея</h2>
+                        <p class="text-sm text-[#87877E]">Қуандық Құдайбергенұлы, ғарышкерлер және Байқоңыр тарихы</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="group relative rounded-xl overflow-hidden border border-[#D9D9D3] bg-white">
+                        <img src="images/kagaz.jpeg" alt="Портрет" class="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300" onerror="this.onerror=null; this.src='https://placehold.co/400x300/f1f5f9/3e4c59?text=1';">
+                        <div class="p-4 bg-[#F5F5F2] border-t border-[#D9D9D3]">
+                            <h4 class="font-bold text-[#2A2A26] text-sm">Официалды портреті</h4>
+                            <p class="text-xs text-[#87877E]">Қуандық Құдайбергенұлы</p>
+                        </div>
+                    </div>
+
+                    <div class="group relative rounded-xl overflow-hidden border border-[#D9D9D3] bg-white">
+                        <img src="images/baldar.jpeg" alt="Жұмыс сәті" class="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300" onerror="this.onerror=null; this.src='https://placehold.co/400x300/f1f5f9/3e4c59?text=2';">
+                        <div class="p-4 bg-[#F5F5F2] border-t border-[#D9D9D3]">
+                            <h4 class="font-bold text-[#2A2A26] text-sm">Шығармашылық сәт</h4>
+                            <p class="text-xs text-[#87877E]">Оқушылармен және оқырмандармен кездесуде</p>
+                        </div>
+                    </div>
+
+                    <div class="group relative rounded-xl overflow-hidden border border-[#D9D9D3] bg-white">
+                        <img src="images/olen.jpeg" alt="Сәт Сапар және Айдын" class="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300" onerror="this.onerror=null; this.src='https://placehold.co/400x300/f1f5f9/3e4c59?text=3';">
+                        <div class="p-4 bg-[#F5F5F2] border-t border-[#D9D9D3]">
+                            <h4 class="font-bold text-[#2A2A26] text-sm">«Сәт сапар!» парақшасы</h4>
+                            <p class="text-xs text-[#87877E]">Айдын Аимбетовке арналған өлең парағы (2015 ж.)</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Feedback & Essay Form + Saved List -->
+        <section id="feedback" class="scroll-mt-20">
+            <div class="glow-card rounded-2xl p-6 sm:p-10">
+                <h2 class="text-2xl sm:text-3xl font-bold text-[#2A2A26] mb-2">Оқушының пікірі немесе эссесі</h2>
+                <p class="text-[#87877E] text-sm mb-6">«Туған жердің әдеби картасы» бойынша өз ойыңызды немесе эссеңізді қалдырыңыз:</p>
+
+                <form id="feedback-form" onsubmit="handleFeedback(event)" class="space-y-4 max-w-2xl">
+                    <div>
+                        <label class="block text-sm text-[#56564F] mb-1">Аты-жөніңіз:</label>
+                        <input type="text" id="user-name" required maxlength="80" class="w-full bg-white border border-[#C6C6C0] rounded-xl p-3 text-[#2A2A26] placeholder-[#A8A8A0] focus:outline-none focus:border-[#3E4C59]">
+                    </div>
+                    <div>
+                        <label class="block text-sm text-[#56564F] mb-1">Эссе / Түйін сөз:</label>
+                        <textarea id="user-essay" rows="4" required maxlength="2000" placeholder="Байқоңыр мен Қуандық ақынның шығармашылығы туралы ойым..." class="w-full bg-white border border-[#C6C6C0] rounded-xl p-3 text-[#2A2A26] placeholder-[#A8A8A0] focus:outline-none focus:border-[#3E4C59]"></textarea>
+                    </div>
+                    <button type="submit" class="bg-[#3E4C59] hover:bg-[#2F3A45] text-white font-bold px-6 py-3 rounded-xl transition-colors shadow-sm">
+                        <i class="fa-solid fa-paper-plane mr-1"></i> Жіберу және сақтау
+                    </button>
+                </form>
+
+                <div id="feedback-alert" class="hidden mt-4 p-4 rounded-xl bg-[#E5E8EB] border border-[#C6C6C0] text-[#3E4C59] text-sm">
+                    <i class="fa-solid fa-check mr-1"></i> Пікіріңіз браузерде сақталды!
+                </div>
+
+                <!-- Saved essays -->
+                <div class="mt-10 pt-8 border-t border-[#D9D9D3]">
+                    <div class="flex items-center justify-between flex-wrap gap-3 mb-4">
+                        <h3 class="text-xl font-bold text-[#2A2A26] flex items-center gap-2">
+                            <i class="fa-solid fa-bookmark text-[#3E4C59]"></i>
+                            Сақталған пікірлер
+                            <span id="essays-count" class="text-xs font-semibold bg-[#E5E8EB] text-[#3E4C59] px-2 py-0.5 rounded-full">0</span>
+                        </h3>
+                        <button id="clear-all-btn" onclick="clearAllEssays()" class="hidden text-xs text-[#87877E] hover:text-red-600 transition-colors font-semibold">
+                            <i class="fa-solid fa-trash-can mr-1"></i> Барлығын жою
+                        </button>
+                    </div>
+                    <div id="essays-list" class="space-y-3"></div>
+                    <p class="mt-4 text-xs text-[#87877E] italic">
+                        <i class="fa-solid fa-circle-info mr-1"></i>
+                        Пікірлер осы браузерде ғана сақталады (localStorage). Басқа құрылғыдан көрінбейді.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="no-print mt-16 border-t border-[#D9D9D3] bg-[#E8E8E3] py-8">
+        <div class="max-w-7xl mx-auto px-4 text-center text-xs text-[#87877E] space-y-2">
+            <p>© 2026 Қуандық Құдайбергенұлына арналған Әдеби-интерактивті портал.</p>
+            <p>Байқоңыр • Қазақ Поэзиясы & Ғарыш</p>
+        </div>
+    </footer>
+
+    <!-- Leaflet Map JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+    <script>
+        // ============================================================
+        // MAP
+        // ============================================================
+        function initMap() {
+            const mapEl = document.getElementById('map');
+            if (!mapEl || typeof L === 'undefined') return;
+
+            const baikonurCoords = [45.9646, 63.3052];
+
+            const map = L.map('map', {
+                center: baikonurCoords,
+                zoom: 11,
+                scrollWheelZoom: true
+            });
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors'
+            }).addTo(map);
+
+            const baikonurIcon = L.divIcon({
+                className: '',
+                html: '<div class="baikonur-pin"></div>',
+                iconSize: [20, 20],
+                iconAnchor: [10, 10],
+                popupAnchor: [0, -12]
+            });
+
+            const marker = L.marker(baikonurCoords, { icon: baikonurIcon }).addTo(map);
+
+            marker.bindPopup(`
+                <h4>🚀 Байқоңыр</h4>
+                <div><strong>Ел:</strong> Қазақстан</div>
+                <div><strong>Облыс:</strong> Қызылорда облысы</div>
+                <div><strong>Қала:</strong> Байқоңыр</div>
+                <div style="margin-top:6px; font-size:12px; color:#56564F;">
+                    Әлемдегі ең алғашқы ғарыш айлағы.<br>
+                    «Сәт сапар!» өлеңінің шабыт көзі.
+                </div>
+            `).openPopup();
+
+            L.circle(baikonurCoords, {
+                color: '#3E4C59', weight: 1, opacity: 0.5,
+                fillColor: '#3E4C59', fillOpacity: 0.06,
+                radius: 30000
+            }).addTo(map);
+
+            const kyzylordaCoords = [44.8488, 65.4823];
+            L.circleMarker(kyzylordaCoords, {
+                radius: 6, color: '#87877E', weight: 2,
+                fillColor: '#FFFFFF', fillOpacity: 1
+            }).addTo(map).bindPopup(`
+                <h4>Қызылорда</h4>
+                <div style="font-size:12px; color:#56564F;">Облыс орталығы</div>
+            `);
+
+            L.control.scale({ imperial: false, metric: true }).addTo(map);
+
+            setTimeout(() => map.invalidateSize(), 200);
+        }
+
+        // ============================================================
+        // QUIZ
+        // ============================================================
+        const quizQuestions = [
+            { q: "1. Қуандық Құдайбергенұлы қай жылы дүниеге келген?",
+              options: ["1953 жылы", "1960 жылы", "1945 жылы", "1970 жылы"], correct: 0 },
+            { q: "2. Ақынның «Сәт сапар!» өлеңі арналған қазақ ғарышкері кім?",
+              options: ["Тоқтар Әубәкіров", "Талғат Мусабаев", "Айдын Аимбетов", "Юрий Гагарин"], correct: 2 },
+            { q: "3. «Әдеби картада» Байқоңыр нүктесі қай ақынның есімімен байланыстырылды?",
+              options: ["Абай Құнанбайұлы", "Мағжан Жұмабаев", "Мұқағали Мақатаев", "Қуандық Құдайбергенұлы"], correct: 3 },
+            { q: "4. Ақынның 2011 жылы жарық көрген жеке өлеңдер жинағы қалай аталады?",
+              options: ["«Жылдарым – бақыт құсым»", "«Ғарыш пен Жер»", "«Байқоңыр жырлары»", "«Аспан әлемі»"], correct: 0 }
+        ];
+
+        let selectedAnswers = {};
+
+        function renderQuiz() {
+            const container = document.getElementById('quiz-container');
+            container.innerHTML = '';
+
+            quizQuestions.forEach((q, index) => {
+                const qDiv = document.createElement('div');
+                qDiv.className = 'bg-[#F7F7F4] p-5 rounded-xl border border-[#D9D9D3] space-y-3';
+
+                let optionsHTML = '';
+                q.options.forEach((opt, optIndex) => {
+                    optionsHTML += `
+                        <label class="flex items-center gap-3 p-3 rounded-lg border border-[#D9D9D3] bg-white hover:bg-[#F5F5F2] cursor-pointer transition-colors text-sm text-[#2A2A26]">
+                            <input type="radio" name="question-${index}" value="${optIndex}" onchange="selectAnswer(${index}, ${optIndex})">
+                            <span>${opt}</span>
+                        </label>
+                    `;
+                });
+
+                qDiv.innerHTML = `
+                    <h4 class="font-semibold text-[#2A2A26] text-base">${q.q}</h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2">${optionsHTML}</div>
+                `;
+                container.appendChild(qDiv);
+            });
+
+            const submitBtn = document.createElement('button');
+            submitBtn.className = 'mt-4 bg-[#3E4C59] hover:bg-[#2F3A45] text-white font-bold px-6 py-3 rounded-xl shadow-sm transition-colors text-sm';
+            submitBtn.innerText = 'Нәтижені тексеру';
+            submitBtn.onclick = checkQuizResults;
+            container.appendChild(submitBtn);
+        }
+
+        function selectAnswer(qIdx, optIdx) { selectedAnswers[qIdx] = optIdx; }
+
+        function checkQuizResults() {
+            let score = 0;
+            quizQuestions.forEach((q, idx) => { if (selectedAnswers[idx] === q.correct) score++; });
+
+            const resultDiv = document.getElementById('quiz-result');
+            document.getElementById('score-text').innerText = `${score} / ${quizQuestions.length}`;
+
+            const resultMsg = document.getElementById('result-message');
+            if (score === quizQuestions.length) {
+                resultMsg.innerText = 'Өте тамаша! Сіз Қуандық Құдайбергенұлының өмірбаяны мен шығармашылығын өте жақсы білесіз!';
+            } else if (score >= 2) {
+                resultMsg.innerText = 'Жақсы нәтиже! Материалдарды қайталап оқып шығуға кеңес береміз.';
+            } else {
+                resultMsg.innerText = 'Ақын жайлы деректерді қайтадан оқып шығыңыз!';
+            }
+            resultDiv.classList.remove('hidden');
+        }
+
+        function resetQuiz() {
+            selectedAnswers = {};
+            document.getElementById('quiz-result').classList.add('hidden');
+            renderQuiz();
+        }
+
+        // ============================================================
+        // TEXT-TO-SPEECH
+        // ============================================================
+        let isSpeaking = false;
+        const poemText = `
+            Байқоңыр - бұл ғарыштың баспалдағы
+            Ұласқан құс жолына аспандағы.
+            Адамзат тарихында осы жерден
+            Жұлдызға Ұлы жорық басталғанды.
+
+            Бетке алып көк аспанды зымырандар,
+            Ғарышқа сапар шекті талай жылдар.
+            Тәуелсіздік байрағын жұлдыздарға
+            Жеткізді Талғатымдай Батыр ұлдар.
+
+            Көк бөрінің ұрпағы, Қазақ – атым,
+            Ежелден ер халық деп саналатын.
+            Қасиетті Құранды айға апардық
+            Ардақтап аталардың аманатын.
+
+            Бүгін той, Байқоңырда Ұлан-асыр
+            Ғарышқа Қазақ ұшып бара жатыр!
+            Талғамтай ағалардың жолын берсін
+            Сапарың сәтті болсын, Айдын-батыр!
+        `;
+
+        function toggleAudio() {
+            if (!('speechSynthesis' in window)) {
+                alert('Өкінішке орай, сіздің браузеріңізде дауысты оқу қызметі қолдау таппайды.');
+                return;
+            }
+            const btnText = document.getElementById('speech-text');
+            const btnIcon = document.getElementById('speech-icon');
+
+            if (isSpeaking) {
+                window.speechSynthesis.cancel();
+                isSpeaking = false;
+                btnText.innerText = 'Өлеңді дауыстап оқу';
+                btnIcon.className = 'fa-solid fa-play';
+            } else {
+                const utterance = new SpeechSynthesisUtterance(poemText);
+                utterance.lang = 'kk-KZ';
+                utterance.rate = 0.9;
+                utterance.onend = () => {
+                    isSpeaking = false;
+                    btnText.innerText = 'Өлеңді дауыстап оқу';
+                    btnIcon.className = 'fa-solid fa-play';
+                };
+                window.speechSynthesis.speak(utterance);
+                isSpeaking = true;
+                btnText.innerText = 'Тоқтату';
+                btnIcon.className = 'fa-solid fa-square';
+            }
+        }
+
+        // ============================================================
+        // FEEDBACK (localStorage)
+        // ============================================================
+        const ESSAYS_KEY = 'baikonur_essays';
+        const STUDENT_NAME_KEY = 'baikonur_student_name';
+        const STUDENT_SCHOOL_KEY = 'baikonur_student_school';
+
+        function escapeHtml(str) {
+            return String(str).replace(/[&<>"']/g, c => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+            }[c]));
+        }
+
+        function getEssays() {
+            try {
+                return JSON.parse(localStorage.getItem(ESSAYS_KEY) || '[]');
+            } catch (e) {
+                return [];
+            }
+        }
+
+        function saveEssays(list) {
+            try {
+                localStorage.setItem(ESSAYS_KEY, JSON.stringify(list));
+            } catch (e) {
+                alert('Сақтау мүмкін болмады. Браузер жады толы болуы мүмкін.');
+            }
+        }
+
+        function renderEssays() {
+            const container = document.getElementById('essays-list');
+            const counter = document.getElementById('essays-count');
+            const clearBtn = document.getElementById('clear-all-btn');
+            if (!container) return;
+
+            const list = getEssays();
+            counter.innerText = list.length;
+
+            if (list.length === 0) {
+                clearBtn.classList.add('hidden');
+                container.innerHTML = `
+                    <p class="text-sm text-[#87877E] italic bg-[#F7F7F4] border border-dashed border-[#C6C6C0] rounded-xl p-6 text-center">
+                        <i class="fa-solid fa-feather-pointed mr-1"></i>
+                        Әзірге пікір жоқ. Бірінші болып өз ойыңызды қалдырыңыз!
+                    </p>
+                `;
+                return;
+            }
+
+            clearBtn.classList.remove('hidden');
+
+            container.innerHTML = list.slice().reverse().map((e) => {
+                const realIndex = list.indexOf(e);
+                return `
+                    <div class="bg-[#F7F7F4] border border-[#D9D9D3] rounded-xl p-4">
+                        <div class="flex justify-between items-start gap-2 mb-2">
+                            <div>
+                                <h4 class="font-bold text-[#2A2A26] text-sm">${escapeHtml(e.name)}</h4>
+                                <p class="text-xs text-[#87877E]">${escapeHtml(e.date)}</p>
+                            </div>
+                            <button onclick="deleteEssay(${realIndex})" class="text-[#87877E] hover:text-red-600 transition-colors" title="Жою">
+                                <i class="fa-solid fa-trash text-sm"></i>
+                            </button>
+                        </div>
+                        <p class="text-sm text-[#56564F] whitespace-pre-wrap break-words">${escapeHtml(e.essay)}</p>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function handleFeedback(e) {
+            e.preventDefault();
+            const nameEl = document.getElementById('user-name');
+            const essayEl = document.getElementById('user-essay');
+            const name = nameEl.value.trim();
+            const essay = essayEl.value.trim();
+
+            if (!name || !essay) return;
+
+            const list = getEssays();
+            list.push({
+                name,
+                essay,
+                date: new Date().toLocaleString('kk-KZ', {
+                    year: 'numeric', month: '2-digit', day: '2-digit',
+                    hour: '2-digit', minute: '2-digit'
+                })
+            });
+            saveEssays(list);
+
+            nameEl.value = '';
+            essayEl.value = '';
+            renderEssays();
+
+            const alert = document.getElementById('feedback-alert');
+            alert.classList.remove('hidden');
+            setTimeout(() => alert.classList.add('hidden'), 4000);
+        }
+
+        function deleteEssay(index) {
+            if (!confirm('Бұл пікірді жоюды растайсыз ба?')) return;
+            const list = getEssays();
+            list.splice(index, 1);
+            saveEssays(list);
+            renderEssays();
+        }
+
+        function clearAllEssays() {
+            if (!confirm('Барлық сақталған пікірлерді жоюды растайсыз ба?')) return;
+            localStorage.removeItem(ESSAYS_KEY);
+            renderEssays();
+        }
+
+        // ============================================================
+        // STUDENT INFO (auto-save)
+        // ============================================================
+        function initStudentInfo() {
+            const nameEl = document.getElementById('student-name');
+            const schoolEl = document.getElementById('student-school');
+            if (!nameEl || !schoolEl) return;
+
+            nameEl.value = localStorage.getItem(STUDENT_NAME_KEY) || '';
+            schoolEl.value = localStorage.getItem(STUDENT_SCHOOL_KEY) || '';
+
+            nameEl.addEventListener('input', () => localStorage.setItem(STUDENT_NAME_KEY, nameEl.value));
+            schoolEl.addEventListener('input', () => localStorage.setItem(STUDENT_SCHOOL_KEY, schoolEl.value));
+        }
+
+        // ============================================================
+        // INIT
+        // ============================================================
+        window.addEventListener('load', function() {
+            renderQuiz();
+            initMap();
+            renderEssays();
+            initStudentInfo();
+        });
+    </script>
+</body>
+</html>
