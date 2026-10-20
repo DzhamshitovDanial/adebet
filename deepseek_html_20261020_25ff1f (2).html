@@ -342,21 +342,6 @@
                             <span>Отанды сүю (Құндылық)</span>
                         </div>
                     </div>
-
-                    <!-- Student info (auto-saved to browser) -->
-                    <div class="mt-8 pt-6 border-t border-[#D9D9D3] grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-                        <div>
-                            <label class="block text-[#87877E] mb-1">Зерттеуші оқушының аты-жөні:</label>
-                            <input type="text" id="student-name" placeholder="Аты-жөніңізді жазыңыз..." class="w-full bg-white border border-[#C6C6C0] rounded-lg p-2 text-[#2A2A26] placeholder-[#A8A8A0] focus:outline-none focus:border-[#3E4C59]">
-                        </div>
-                        <div>
-                            <label class="block text-[#87877E] mb-1">Мектеп / Сынып:</label>
-                            <input type="text" id="student-school" placeholder="Мектеп және 9-сынып..." class="w-full bg-white border border-[#C6C6C0] rounded-lg p-2 text-[#2A2A26] placeholder-[#A8A8A0] focus:outline-none focus:border-[#3E4C59]">
-                        </div>
-                        <p class="sm:col-span-2 text-[#87877E] italic">
-                            <i class="fa-solid fa-circle-info mr-1"></i> Деректер браузерде автоматты түрде сақталады.
-                        </p>
-                    </div>
                 </div>
             </div>
         </section>
@@ -401,7 +386,8 @@
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                     <div class="group relative rounded-xl overflow-hidden border border-[#D9D9D3] bg-white">
-                        <img src="images/kagaz.jpeg" alt="Портрет" class="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300" onerror="this.onerror=null; this.src='https://placehold.co/400x300/f1f5f9/3e4c59?text=1';">
+                        <!-- Изменено на h-auto, чтобы фото было полностью видно -->
+                        <img src="images/kagaz.jpeg" alt="Портрет" class="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-300" onerror="this.onerror=null; this.src='https://placehold.co/400x300/f1f5f9/3e4c59?text=1';">
                         <div class="p-4 bg-[#F5F5F2] border-t border-[#D9D9D3]">
                             <h4 class="font-bold text-[#2A2A26] text-sm">Официалды портреті</h4>
                             <p class="text-xs text-[#87877E]">Қуандық Құдайбергенұлы</p>
@@ -409,7 +395,8 @@
                     </div>
 
                     <div class="group relative rounded-xl overflow-hidden border border-[#D9D9D3] bg-white">
-                        <img src="images/baldar.jpeg" alt="Жұмыс сәті" class="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300" onerror="this.onerror=null; this.src='https://placehold.co/400x300/f1f5f9/3e4c59?text=2';">
+                        <!-- Изменено на h-auto, чтобы фото было полностью видно -->
+                        <img src="images/baldar.jpeg" alt="Жұмыс сәті" class="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-300" onerror="this.onerror=null; this.src='https://placehold.co/400x300/f1f5f9/3e4c59?text=2';">
                         <div class="p-4 bg-[#F5F5F2] border-t border-[#D9D9D3]">
                             <h4 class="font-bold text-[#2A2A26] text-sm">Шығармашылық сәт</h4>
                             <p class="text-xs text-[#87877E]">Оқушылармен және оқырмандармен кездесуде</p>
@@ -417,7 +404,8 @@
                     </div>
 
                     <div class="group relative rounded-xl overflow-hidden border border-[#D9D9D3] bg-white">
-                        <img src="images/olen.jpeg" alt="Сәт Сапар және Айдын" class="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300" onerror="this.onerror=null; this.src='https://placehold.co/400x300/f1f5f9/3e4c59?text=3';">
+                        <!-- Изменено на h-auto, чтобы фото было полностью видно -->
+                        <img src="images/olen.jpeg" alt="Сәт Сапар және Айдын" class="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-300" onerror="this.onerror=null; this.src='https://placehold.co/400x300/f1f5f9/3e4c59?text=3';">
                         <div class="p-4 bg-[#F5F5F2] border-t border-[#D9D9D3]">
                             <h4 class="font-bold text-[#2A2A26] text-sm">«Сәт сапар!» парақшасы</h4>
                             <p class="text-xs text-[#87877E]">Айдын Аимбетовке арналған өлең парағы (2015 ж.)</p>
@@ -680,8 +668,6 @@
         // FEEDBACK (localStorage)
         // ============================================================
         const ESSAYS_KEY = 'baikonur_essays';
-        const STUDENT_NAME_KEY = 'baikonur_student_name';
-        const STUDENT_SCHOOL_KEY = 'baikonur_student_school';
 
         function escapeHtml(str) {
             return String(str).replace(/[&<>"']/g, c => ({
@@ -790,28 +776,12 @@
         }
 
         // ============================================================
-        // STUDENT INFO (auto-save)
-        // ============================================================
-        function initStudentInfo() {
-            const nameEl = document.getElementById('student-name');
-            const schoolEl = document.getElementById('student-school');
-            if (!nameEl || !schoolEl) return;
-
-            nameEl.value = localStorage.getItem(STUDENT_NAME_KEY) || '';
-            schoolEl.value = localStorage.getItem(STUDENT_SCHOOL_KEY) || '';
-
-            nameEl.addEventListener('input', () => localStorage.setItem(STUDENT_NAME_KEY, nameEl.value));
-            schoolEl.addEventListener('input', () => localStorage.setItem(STUDENT_SCHOOL_KEY, schoolEl.value));
-        }
-
-        // ============================================================
         // INIT
         // ============================================================
         window.addEventListener('load', function() {
             renderQuiz();
             initMap();
             renderEssays();
-            initStudentInfo();
         });
     </script>
 </body>
